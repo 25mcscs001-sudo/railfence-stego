@@ -1,0 +1,81 @@
+	<!DOCTYPE html>
+<html>
+<head>
+<title>Rail Fence Decryptor</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+    input, button {
+        padding: 8px;
+        margin: 5px 0;
+        width: 300px;
+    }
+    textarea {
+        width: 300px;
+        height: 100px;
+    }
+</style>
+</head>
+<body>
+
+<h2>Rail Fence Cipher Decryptor (Web Tool)</h2>
+
+<label>Enter Ciphertext:</label><br>
+<input type="text" id="ciphertext"><br>
+
+<label>Enter Number of Rails:</label><br>
+<input type="number" id="rails" min="2"><br>
+
+<button onclick="decryptText()">Decrypt</button>
+
+<h3>Decrypted Output:</h3>
+<textarea id="output" readonly></textarea>
+
+<script>
+// Rail Fence Decrypt Function
+function railFenceDecrypt(cipher, rails) {
+    if (rails <= 1) return cipher;
+
+    let rail = Array.from({ length: rails }, () => []);
+    let len = cipher.length;
+    let row = 0, dir_down = true;
+    let pattern = [];
+
+    for (let i = 0; i < len; i++) {
+        pattern.push(row);
+        if (row === 0) dir_down = true;
+        if (row === rails - 1) dir_down = false;
+        row += dir_down ? 1 : -1;
+    }
+
+    let railLengths = Array(rails).fill(0);
+    for (let pos of pattern) railLengths[pos]++;
+
+    let index = 0;
+    for (let r = 0; r < rails; r++) {
+        for (let j = 0; j < railLengths[r]; j++) {
+            rail[r].push(cipher[index++]);
+        }
+    }
+
+    let result = "";
+    let railPos = Array(rails).fill(0);
+    for (let pos of pattern) {
+        result += rail[pos][railPos[pos]++];
+    }
+
+    return result;
+}
+
+function decryptText() {
+    let ciphertext = document.getElementById("ciphertext").value;
+    let rails = parseInt(document.getElementById("rails").value);
+    let plaintext = railFenceDecrypt(ciphertext, rails);
+    document.getElementById("output").value = plaintext;
+}
+</script>
+
+</body>
+</html>
